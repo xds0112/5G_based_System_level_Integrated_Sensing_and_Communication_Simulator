@@ -20,12 +20,36 @@ System-level Simulator for NR-based Integrated Sensing and Communication (ISAC) 
 
 ## Authors paticipated:
 D.S. Xue, J.C. Wei, Y.G. Li, T.L. Zeng, <br>
-Key Laboratory of Universal Wireless Communications, Ministry of Education, BUPT.
+Key Laboratory of Universal Wireless Communications, Ministry of Education, <br>
+Beijing University of Posts and Telecommunications, <br>
+Beijing, PR China.
 
 
 ## MATLAB version and toolboxes required: 
 R2022b or above,<br>
 5G Toolbox, Phased Array Toolbox, Wireless Communication Toolbox.
+
+
+## Getting Started
+To simulate system-level ISAC scenario, <br>
+first, deploy the scenario in the "scenarios" folder, <br>
+and then locate the corresponding file name in the "launcherFiles" folder to run the simulation.
+
+
+## Documentation
+None at present.
+
+
+## License
+Copyright (C) 2023 Beijing University of Posts and Telecommunications<br>
+All rights reserved.<br>
+
+System-level ISAC Simulator<br>
+Author: Dongsheng Xue
+
+
+## Contact
+xuedongsheng@bupt.edu.cn
 
 
 ## 3GPP Standards:
