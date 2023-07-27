@@ -4,7 +4,7 @@ System-level Simulator for NR-based Integrated Sensing and Communication (ISAC) 
 ## Incooperates the following parts:.
   Scenario generation based on the OpenStreetMap open-sources,<br>
   Multi-node ISAC network simulation,<br>
-  Communication simulation functions (MU-MIMO), including:<br>
+  Communication simulation functions (MIMO), including:<br>
        APP layers modeling<br>
        RLC layers modeling<br>
        MAC layers modeling<br>
@@ -12,7 +12,7 @@ System-level Simulator for NR-based Integrated Sensing and Communication (ISAC) 
        CDL channel modeling<br>
        Pathloss modeling<br>
        Simulation visualization tools<br>
-  Sensing simulation functions (Mono-static sensing), including:<br>
+  Sensing simulation functions (mono-static sensing), including:<br>
        two-way propagation channel modeling<br>
        mono-static sensing modeling<br><br>
        detection algorithms<br>
