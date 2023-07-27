@@ -34,8 +34,8 @@
 
 ## Getting Started
     To simulate system-level ISAC scenario,
-    first, deploy the scenario in the *scenarios* folder,
-    and then locate the corresponding file name in the *launcherFiles* folder to run the simulation.
+    first, deploy the scenario in the 'scenarios' folder,
+    and then locate the corresponding file name in the 'launcherFiles' folder to run the simulation.
 
 
 ## Documentation
