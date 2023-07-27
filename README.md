@@ -1,7 +1,8 @@
 # 5G-based System-level Integrated Sensing and Communication Simulator
     System-level Simulator for NR-based Integrated Sensing and Communication (ISAC) Network.
 
-## Incooperates the following parts:.
+
+## Incooperates the following parts:<br>
 ###  Scenario generation based on the *OpenStreetMap™* open-sources,<br>
 ###  Multi-node ISAC network simulation,<br>
 ###  Communication simulation functions (MIMO), including:<br>
@@ -17,6 +18,7 @@
     mono-static sensing modeling
     radar detection algorithms (2D-CFAR)
     radar estimation algorithms (2D-FFT and MUSIC)
+
 
 ### Authors paticipated:<br>
     D.S. Xue, J.C. Wei, Y.G. Li, T.L. Zeng,
