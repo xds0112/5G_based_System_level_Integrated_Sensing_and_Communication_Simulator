@@ -821,7 +821,6 @@ classdef gNBPhy < communication.phyLayer.phyInterface
             end
             
             % Apply path loss on the waveform
-            % Assume that the gNB is located at [0 0 30]
             if ~strcmp(obj.PathLossConfig, 'fspl') % Configured as 5G NR pathloss models
                 pathLoss = communication.pathlossModels.config5GNRModels(obj.PathLossConfig, pktInfo.CarrierFreq, obj.LoSConditions(pktInfo.RNTI), obj.Node.Position, pktInfo.Position);
             else  % Configured as the free space pathloss model
