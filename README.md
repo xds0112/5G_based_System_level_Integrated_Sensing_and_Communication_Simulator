@@ -2,21 +2,21 @@
 System-level Simulator for NR-based Integrated Sensing and Communication (ISAC) Network.
 
 ## Incooperates the following parts:.
-  Scenario generation based on the *OpenStreetMap™* open-sources,<br>
-  Multi-node ISAC network simulation,<br>
-  Communication simulation functions (MIMO), including:<br>
-       ### APP layers modeling<br>
-       ### RLC layers modeling<br>
-       ### MAC layers modeling<br>
-       ### PHY layers modeling<br>
-       ### CDL channel modeling<br>
-       ###Pathloss modeling<br>
-       ### Simulation visualization tools<br>
- Sensing simulation functions (mono-static sensing), including:<br>
-       ### two-way propagation channel modeling<br>
-       ### mono-static sensing modeling<br>
-       ### radar detection algorithms (2D-CFAR)<br>
-       ### radar estimation algorithms (2D-FFT and MUSIC)<br>
+###  Scenario generation based on the *OpenStreetMap™* open-sources,<br>
+###  Multi-node ISAC network simulation,<br>
+###  Communication simulation functions (MIMO), including:<br>
+       APP layers modeling
+       RLC layers modeling
+       MAC layers modeling
+       PHY layers modeling
+       CDL channel modeling
+       Pathloss modeling
+       Simulation visualization tools
+### Sensing simulation functions (mono-static sensing), including:<br>
+       two-way propagation channel modeling
+       mono-static sensing modeling
+       radar detection algorithms (2D-CFAR)
+       radar estimation algorithms (2D-FFT and MUSIC)
 
 ## Authors paticipated:
 D.S. Xue, J.C. Wei, Y.G. Li, T.L. Zeng, <br>
