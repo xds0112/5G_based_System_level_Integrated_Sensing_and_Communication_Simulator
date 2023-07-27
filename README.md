@@ -14,9 +14,9 @@ System-level Simulator for NR-based Integrated Sensing and Communication (ISAC) 
        Simulation visualization tools<br>
   Sensing simulation functions (mono-static sensing), including:<br>
        two-way propagation channel modeling<br>
-       mono-static sensing modeling<br><br>
-       detection algorithms<br>
-       estimation algorithms<br>
+       mono-static sensing modeling<br>
+       radar detection algorithms (2D-CFAR)<br>
+       radar estimation algorithms (2D-FFT and MUSIC)<br>
 
 ## Authors paticipated:
 D.S. Xue, J.C. Wei, Y.G. Li, T.L. Zeng, <br>
