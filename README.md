@@ -2,10 +2,10 @@
 System-level Simulator for NR-based Integrated Sensing and Communication (ISAC) Network.
 
 ## Incooperates the following parts:.
-  ### Scenario generation based on the OpenStreetMap open-sources,<br>
+  ### Scenario generation based on the *OpenStreetMap™* open-sources,<br>
   ### Multi-node ISAC network simulation,<br>
   ### Communication simulation functions (MIMO), including:<br>
-       #### APP layers modeling<br>
+       APP layers modeling<br>
        RLC layers modeling<br>
        MAC layers modeling<br>
        PHY layers modeling<br>
@@ -26,14 +26,14 @@ Beijing, PR China.
 
 
 ## MATLAB version and toolboxes required: 
-R2022b or above,<br>
-5G Toolbox, Phased Array Toolbox, Wireless Communication Toolbox.
+**R2022b** or above, <br>
+**5G Toolbox**, **Phased Array System Toolbox**, **Wireless Communication Toolbox**.
 
 
 ## Getting Started
 To simulate system-level ISAC scenario, <br>
-first, deploy the scenario in the "scenarios" folder, <br>
-and then locate the corresponding file name in the "launcherFiles" folder to run the simulation.
+first, deploy the scenario in the *scenarios* folder, <br>
+and then locate the corresponding file name in the *launcherFiles* folder to run the simulation.
 
 
 ## Documentation
@@ -45,7 +45,7 @@ Copyright (C) 2023 Beijing University of Posts and Telecommunications<br>
 All rights reserved.<br>
 
 System-level ISAC Simulator<br>
-Author: Dongsheng Xue
+Author: **Dongsheng Xue**
 
 
 ## Contact
