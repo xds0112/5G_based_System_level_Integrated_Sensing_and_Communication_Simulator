@@ -136,7 +136,7 @@ function estResults = fft2D(radarEstParams, cfar, rxGrid, txGrid)
             case 'gausswin'     % Gaussian window
                 rngWin = repmat(gausswin(nSc,3),[1 nSym]);
                 dopWin = repmat(gausswin(nSym,3),[1 nIFFT]).';
-            case 'tukeywin'     % Gaussian window
+            case 'tukeywin'     % Tukey window
                 rngWin = repmat(tukeywin(nSc,3),[1 nSym]);
                 dopWin = repmat(tukeywin(nSym,3),[1 nIFFT]).';
             otherwise           % Default to Hamming window
