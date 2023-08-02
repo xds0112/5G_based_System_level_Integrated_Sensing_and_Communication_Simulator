@@ -45,7 +45,7 @@ function estResults = fft2D(radarEstParams, cfar, rxGrid, txGrid)
 
     %% Simulation params initialization
     % 3D-FFT parameters
-    detections  = cell(nAnts, 1);
+    detections = cell(nAnts, 1);
 
     % Estimated results
     estResults = struct;
@@ -75,27 +75,30 @@ function estResults = fft2D(radarEstParams, cfar, rxGrid, txGrid)
         detections{r} = cfarDetector(abs(rdm(:,:,r).^2), CUTIdx);
         nDetecions = size(detections{r}, 2);
 
-        % Range and velocity estimation
-        for i = 1:nDetecions
-            
-            if ~isempty(detections{r})
+        if ~isempty(detections{r})
+
+            for i = 1:nDetecions
 
                 % Detection indices
                 rngIdx = detections{r}(1,i)-1;
                 velIdx = detections{r}(2,i)-nFFT/2-1;
 
-                % Assignment
+                % Range and velocity estimation
                 rngEst{r} = rngIdx.*radarEstParams.rRes;
                 velEst{r} = velIdx.*radarEstParams.vRes;
+
+                % Range and Doppler estimation values
+                % Remove outliers from estimation values
+                rngEstFiltered = filterOutliers(cat(2, rngEst{:}));
+                velEstFiltered = filterOutliers(cat(2, velEst{:}));
+                % Assignment
+                estResults(i).rngEst = mean(rngEstFiltered, 2);
+                estResults(i).velEst = mean(velEstFiltered, 2);
 
                 % Angle steering vector, [nAnts x nDetecions]
                 angleData(r,i) = rdm(rngIdx, velIdx+nFFT/2, r);
 
             end
-
-            % Mean range and Doppler estimation values
-            estResults(i).rngEst = mean(cat(2, rngEst{:}), 2);
-            estResults(i).velEst = mean(cat(2, velEst{:}), 2);
 
          end
     end
@@ -125,24 +128,36 @@ function estResults = fft2D(radarEstParams, cfar, rxGrid, txGrid)
                 rngWin = repmat(kaiser(nSc,3),[1 nSym]);
                 dopWin = repmat(kaiser(nSym,3),[1 nIFFT]).';
             case 'taylorwin'    % Taylor window
-                rngWin = repmat(taylorwin(nSc,3),[1 nSym]);
-                dopWin = repmat(taylorwin(nSym,3),[1 nIFFT]).';
+                rngWin = repmat(taylorwin(nSc,5),[1 nSym]);
+                dopWin = repmat(taylorwin(nSym,5),[1 nIFFT]).';
             case 'chebwin'      % Chebyshev window
-                rngWin = repmat(chebwin(nSc,3),[1 nSym]);
-                dopWin = repmat(chebwin(nSym,3),[1 nIFFT]).';
+                rngWin = repmat(chebwin(nSc,5),[1 nSym]);
+                dopWin = repmat(chebwin(nSym,5),[1 nIFFT]).';
             case 'barthannwin'  % Modified Bartlett-Hann window
                 rngWin = repmat(barthannwin(nSc,3),[1 nSym]);
                 dopWin = repmat(barthannwin(nSym,3),[1 nIFFT]).';
             case 'gausswin'     % Gaussian window
                 rngWin = repmat(gausswin(nSc,3),[1 nSym]);
                 dopWin = repmat(gausswin(nSym,3),[1 nIFFT]).';
-            case 'tukeywin'     % Tukey window
+            case 'tukeywin'     % tukey window
                 rngWin = repmat(tukeywin(nSc,3),[1 nSym]);
                 dopWin = repmat(tukeywin(nSym,3),[1 nIFFT]).';
             otherwise           % Default to Hamming window
                 rngWin = repmat(hamming(nSc,3),[1 nSym]);
                 dopWin = repmat(hamming(nIFFT,3),[1 nSym]).';
         end
+    end
+
+    function filteredData = filterOutliers(data)
+        % Calculate mean and standard deviation
+        meanValue = mean(data);
+        stdValue = std(data);
+    
+        % Define threshold: assume outliers are values beyond mean plus/minus 2 times the standard deviation
+        threshold = 2 * stdValue;
+    
+        % Filter out outliers based on the threshold
+        filteredData = data(abs(data - meanValue) <= threshold);
     end
 
     function plotRDM(aryIdx)
