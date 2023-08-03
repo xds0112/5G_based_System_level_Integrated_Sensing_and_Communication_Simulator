@@ -4,9 +4,9 @@
 
 ## Incooperates the following parts:<br>
 ###  Scenario generation,<br>
-    based on the OpenStreetMap™ open-source data
+    Based on the OpenStreetMap™ open-source data
 ###  Multi-node ISAC network simulation,<br>
-    foucus on implementing key techniques of ISAC
+    Foucus on implementing key techniques of ISAC
 ###  Communication simulation functions (MIMO), including:<br>
     APP layers modeling
     RLC layers modeling
@@ -16,10 +16,10 @@
     Pathloss modeling
     Simulation visualization tools
 ### Sensing simulation functions (mono-static sensing), including:<br>
-    radar bidirectional propagation channel modeling
-    mono-static radar sensing modeling
-    radar detection algorithms (2D-CFAR)
-    radar estimation algorithms (2D-FFT and MUSIC)
+    Radar bidirectional propagation channel modeling
+    Mono-static radar sensing modeling
+    Radar detection algorithms (2D-CFAR)
+    Radar estimation algorithms (2D-FFT and MUSIC)
 
 
 ### Members paticipated in this project:<br>
