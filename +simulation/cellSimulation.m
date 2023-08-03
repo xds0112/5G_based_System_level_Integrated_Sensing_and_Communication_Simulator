@@ -146,7 +146,7 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
     carrierInfo = gNB.PhyEntity.CarrierInformation;
     waveInfoDL  = gNB.PhyEntity.WaveformInfoDL;
     radarParams = sensing.radarParams(cellSimuParams, carrierInfo, waveInfoDL);
-    cfarConfig  = sensing.dectection.cfar2D(radarParams);
+    cfarConfig  = sensing.detection.cfar2D(radarParams);
 
     % Run the processing loop (assuming normal cyclic prefix)  
     slotNum = 0;
