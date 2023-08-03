@@ -1,6 +1,6 @@
 # 5G-based System-level Integrated Sensing and Communication Simulator
     System-level Simulator for NR-based Integrated Sensing and Communication (ISAC).
-
+![image](https://github.com/xds0112/5G_based_System_level_Integrated_Sensing_and_Communication_Simulator/blob/main/platformICON.bmp)
 
 ## Incooperates the following parts:<br>
 ###  Scenario generation,<br>
