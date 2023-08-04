@@ -1,4 +1,4 @@
-function [comResults, senResults] = cellSimulation(cellSimuParams)
+function [comResults, senTxGrid] = cellSimulation(cellSimuParams)
 %CELLSIMULATION
 %   Integrated sensing and communication simulation within a single cell
 
@@ -139,45 +139,44 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
     metricsVisualizer = visualizationTools.metricsVisualizer(cellSimuParams, 'Nodes', nodes, ...
         'EnableSchedulerMetricsPlots', true, 'EnablePhyMetricsPlots', true);
 
-    % Initialize sensing variables
-    % Radar Tx symbols in all slots combined
-    radarTxGrid = [];
-    % Radar estimation parameters
+    % Initialize sensing parameters
+    senTxGrid = [];     % initialize sensing Tx grid
     carrierInfo = gNB.PhyEntity.CarrierInformation;
     waveInfoDL  = gNB.PhyEntity.WaveformInfoDL;
     radarParams = sensing.radarParams(cellSimuParams, carrierInfo, waveInfoDL);
     cfarConfig  = sensing.detection.cfar2D(radarParams);
 
-    % Run the processing loop (assuming normal cyclic prefix)  
+    % Run the processing loop
     slotNum = 0;
     symPerSlot = waveInfoDL.SymbolsPerSlot;
-    numSymbols = cellSimuParams.numSlots*symPerSlot; % Simulation time in units of symbol duration
-    tickGranularity = symPerSlot; % Set to 1 to execute all the symbols in the simulation (not recommanded)
+    numSymbols = cellSimuParams.numSlots*symPerSlot; % simulation time in units of symbol duration
+    tickGranularity = 1; % execute all the symbols in the simulation
 
-    for symbolNum = 1 : tickGranularity : numSymbols    
+    % ISAC process
+    for symbolNum = 1 : tickGranularity : numSymbols
+
         if mod(symbolNum - 1, symPerSlot) == 0
             slotNum = slotNum + 1;
         end
 
         % Run the gNB
         run(gNB);
-        
+
         % Run the UEs
         for ueIdx = 1:cellSimuParams.numUEs 
             run(UEs{ueIdx});
         end
 
-        % Sensing signal processing
         % Determine the current slot type
         currentSlot = gNB.PhyEntity.CurrSlot;
         slotType = communication.determineSlotType(cellSimuParams.tddPattern, cellSimuParams.specialSlot, currentSlot);
-        if strcmp(slotType, 'D')
-            % PDSCH grid in the current slot
-            txGrid = gNB.PhyEntity.txGrid;
-            % Accumulate PDSCH symbols
-            radarTxGrid = cat(2, radarTxGrid, txGrid);
-        end
         
+        % Accumulate PDSCH symbols in the downlink slot
+        if strcmp(slotType, 'D')
+            senTxGrid = cat(2, senTxGrid, gNB.PhyEntity.txGrid);
+        end
+    
+        % Logging
         if cellSimuParams.enableTraces
             % MAC logging
             logCellSchedulingStats(simSchedulingLogger, symbolNum, gNB, UEs);
@@ -200,6 +199,10 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
             advanceTimer(UEs{ueIdx}, tickGranularity);
         end
     end
+
+    %% Radar mono-static sensing and the corresponding results
+    senRxGrid  = sensing.monoStaticSensing(senTxGrid, carrierInfo, waveInfoDL, radarParams);
+    senResults = sensing.estimation.fft2D(radarParams, cfarConfig, senRxGrid, senTxGrid);
     
     %% Communicaiton simulation visualization and Logs
     % For logging the simulation parameters
@@ -274,10 +277,6 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
     end
 
     % Run the script <postSimVisualization> to get a post communication simulation visualization of logs.
-
-    %% Radar mono-static sensing and the corresponding results
-    radarRxGrid = sensing.monoStaticSensing(radarTxGrid, carrierInfo, waveInfoDL, radarParams);
-    senResults  = sensing.estimation.fft2D(radarParams, cfarConfig, radarRxGrid, radarTxGrid);
 
 end
 
