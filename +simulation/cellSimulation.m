@@ -276,7 +276,6 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
     % Run the script <postSimVisualization> to get a post communication simulation visualization of logs.
 
     %% Radar mono-static sensing and the corresponding results
-    senResults = NaN;
     radarRxGrid = sensing.monoStaticSensing(radarTxGrid, carrierInfo, waveInfoDL, radarParams);
     senResults  = sensing.estimation.fft2D(radarParams, cfarConfig, radarRxGrid, radarTxGrid);
 
