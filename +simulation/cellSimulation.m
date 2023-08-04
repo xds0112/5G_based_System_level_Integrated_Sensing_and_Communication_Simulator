@@ -1,4 +1,4 @@
-function [comResults, senTxGrid] = cellSimulation(cellSimuParams)
+function [comResults, senResults] = cellSimulation(cellSimuParams)
 %CELLSIMULATION
 %   Integrated sensing and communication simulation within a single cell
 
