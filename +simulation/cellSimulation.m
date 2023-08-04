@@ -277,8 +277,8 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
 
     %% Radar mono-static sensing and the corresponding results
     senResults = NaN;
-%     radarRxGrid = sensing.monoStaticSensing(radarTxGrid, carrierInfo, waveInfoDL, radarParams);
-%     senResults  = sensing.estimation.fft2D(radarParams, cfarConfig, radarRxGrid, radarTxGrid);
+    radarRxGrid = sensing.monoStaticSensing(radarTxGrid, carrierInfo, waveInfoDL, radarParams);
+    senResults  = sensing.estimation.fft2D(radarParams, cfarConfig, radarRxGrid, radarTxGrid);
 
 end
 
