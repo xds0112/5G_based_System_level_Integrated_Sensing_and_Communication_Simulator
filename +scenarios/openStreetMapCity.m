@@ -106,7 +106,7 @@ function simuParams = openStreetMapCity(simuParams)
     comChannel.attachedBS   = bs;
     comChannel.attachedUEs  = ue;
 
-    % Restore traffic parameters in the simulation parameters
+    % Restore pathloss parameters in the simulation parameters
     simuParams.pathLossParameters('pathloss') = pathloss;
     % Restore traffic parameters in the simulation parameters
     simuParams.comChannelParameters('comChannel') = comChannel;
