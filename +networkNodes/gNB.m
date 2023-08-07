@@ -8,9 +8,9 @@ classdef gNB < networkNodes.node
 
     methods (Access = public)
         function obj = gNB(param)
-            %hNRGNB Create a gNB node
+            %GNB Create a gNB node
             %
-            %   OBJ = hNRGNB(PARAM) creates a gNB node containing RLC and MAC.
+            %   OBJ = GNB(PARAM) creates a gNB node containing RLC and MAC.
             %   PARAM is a structure with following fields:
             %       NumUEs                   - Number of UEs in the cell
             %       SCS                      - Subcarrier spacing used
