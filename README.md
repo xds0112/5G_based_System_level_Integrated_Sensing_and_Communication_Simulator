@@ -6,7 +6,7 @@
 ###  Scenario generation,<br>
     Based on the OpenStreetMap™ open-source data
 ###  Multi-node ISAC network simulation,<br>
-    Foucus on implementing key techniques of ISAC
+    Focus on implementing key techniques of ISAC
 ###  Communication simulation functions (MIMO), including:<br>
     APP layers modeling
     RLC layers modeling
@@ -16,13 +16,14 @@
     Pathloss modeling
     Simulation visualization tools
 ### Sensing simulation functions (mono-static sensing), including:<br>
+### (Closed-Source)
     Radar bidirectional propagation channel modeling
     Mono-static radar sensing modeling
     Radar detection algorithms (2D-CFAR)
     Radar estimation algorithms (2D-FFT and MUSIC)
 
 
-### Members paticipated in this project:<br>
+### Members participated in this project:<br>
     D.S. Xue, J.C. Wei, Y.G. Li, T.L. Zeng,
     Key Laboratory of Universal Wireless Communications, Ministry of Education,
     Beijing University of Posts and Telecommunications,
@@ -35,7 +36,7 @@
 
 
 ## Getting Started
-    To simulate system-level ISAC scenario,
+    To simulate the system-level ISAC scenario,
     first, deploy the scenario in the 'scenarios' folder,
     and then locate the corresponding file name in the 'launcherFiles' folder to run the simulation.
 
