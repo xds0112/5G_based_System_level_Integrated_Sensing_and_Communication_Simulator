@@ -1,6 +1,6 @@
 classdef ula
     %UNIFORMLINEARARRAY 
-    %   Uniform linear array (UPA)
+    %   Uniform linear array (ULA)
     
     properties
         % number of antenna elements (vertical direction)
