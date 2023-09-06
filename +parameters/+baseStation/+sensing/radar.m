@@ -11,8 +11,8 @@ classdef radar
 
         % False alarm rate,
         % used in constant false alarm rate detector,
-        % normally set to 10e-9
-        Pfa = 10e-9
+        % normally set to 1e-9
+        Pfa = 1e-9
 
         % estimation algorithm
         % normally set to 'FFT' (2D-FFT)
