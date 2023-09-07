@@ -596,10 +596,8 @@ classdef gNBPhy < communication.phyLayer.phyInterface
             % Apply signal amplitude
             txWaveform = signalAmp*txWaveform;
 
-            % Sensing transmission resource grid
+            % Sensing transmission resource grid and wave
             obj.senTxGrid = cat(2, obj.senTxGrid, txGrid);
-            
-            % Sensing transmission wave
             obj.senTxWave = cat(1, obj.senTxWave, txWaveform);
         
             % Trim txWaveform to span only the transmission symbols
