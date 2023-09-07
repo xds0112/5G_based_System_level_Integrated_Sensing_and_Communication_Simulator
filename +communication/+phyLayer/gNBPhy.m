@@ -44,15 +44,18 @@ classdef gNBPhy < communication.phyLayer.phyInterface
         % columns 1 and 2 contains the number of erroneously received
         % packets and total received packets, respectively
         ULBlkErr
+
+        %senTxGrid Sensing transmission resource grid
+        senTxGrid = []
+
+        %senTxWave Sensing transmission waveform 
+        senTxWave = []
       
         %WaveformInfoDL Downlink waveform information
         WaveformInfoDL
         
         %WaveformInfoUL Uplink waveform information
         WaveformInfoUL
-
-        %PDSCHTxGrid PDSCH transmitting grid per slot
-        txGrid
 
         %LoSConditions Line of Sight conditions
         % 1 stands for LoS, 0 stands for NLoS
@@ -69,7 +72,7 @@ classdef gNBPhy < communication.phyLayer.phyInterface
         % 'i' models the channel between the gNB and UE with RNTI 'i'
         ChannelModel
     end
-    
+
     properties (Access = private)
         %UEs RNTIs in the cell
         UEs
@@ -561,7 +564,7 @@ classdef gNBPhy < communication.phyLayer.phyInterface
             end
            
             % Initialize Tx grid
-            obj.txGrid = zeros(obj.CarrierInformation.NRBsDL*12, obj.WaveformInfoDL.SymbolsPerSlot, obj.NumTxAnts);
+            txGrid = zeros(obj.CarrierInformation.NRBsDL*12, obj.WaveformInfoDL.SymbolsPerSlot, obj.NumTxAnts);
            
             % Set carrier configuration object
             carrier = nrCarrierConfig;
@@ -575,18 +578,30 @@ classdef gNBPhy < communication.phyLayer.phyInterface
                 csirsInd = nrCSIRSIndices(carrier, obj.CSIRSPDU{idx});
                 csirsSym = nrCSIRS(carrier, obj.CSIRSPDU{idx});
                 % Placing the CSI-RS in the Tx grid
-                obj.txGrid(csirsInd) = csirsSym;
+                txGrid(csirsInd) = csirsSym;
             end
             obj.CSIRSPDU = {};
-            
+
             % Fill PDSCH symbols in the grid
             if ~isempty(obj.PDSCHPDU)
-                obj.txGrid = populatePDSCH(obj, obj.PDSCHPDU, obj.MacPDU, obj.txGrid);
+                txGrid = populatePDSCH(obj, obj.PDSCHPDU, obj.MacPDU, txGrid);
             end
 
             % OFDM modulation
-            txWaveform = nrOFDMModulate(carrier, obj.txGrid);
+            txWaveform = nrOFDMModulate(carrier, txGrid);
+
+            % Signal amplitude
+            signalAmp = db2mag(obj.TxPower-30)*sqrt(obj.WaveformInfoDL.Nfft^2/(size(txGrid, 1)*obj.NumTxAnts));
+
+            % Apply signal amplitude
+            txWaveform = signalAmp*txWaveform;
+
+            % Sensing transmission resource grid
+            obj.senTxGrid = cat(2, obj.senTxGrid, txGrid);
             
+            % Sensing transmission wave
+            obj.senTxWave = cat(1, obj.senTxWave, txWaveform);
+        
             % Trim txWaveform to span only the transmission symbols
             slotNumSubFrame = mod(obj.CurrSlot, obj.WaveformInfoDL.SlotsPerSubframe);
             startSymSubframe = slotNumSubFrame*obj.WaveformInfoDL.SymbolsPerSlot + 1; % Start symbol of current slot in the subframe
@@ -595,12 +610,9 @@ classdef gNBPhy < communication.phyLayer.phyInterface
             startSample = sum(symbolLengths(1:obj.CurrSymbol)) + 1;
             endSample = sum(symbolLengths(1:obj.CurrSymbol+numTxSymbols));
             txWaveform = txWaveform(startSample:endSample, :);
-            
-            % Signal amplitude
-            signalAmp = db2mag(obj.TxPower-30)*sqrt(obj.WaveformInfoDL.Nfft^2/(size(obj.txGrid, 1)*obj.NumTxAnts));
-            
+ 
             % Construct packet information
-            packetInfo.Waveform = signalAmp*txWaveform;
+            packetInfo.Waveform = txWaveform;
             packetInfo.Position = obj.Node.Position;
             packetInfo.NCellID = obj.CellConfig.NCellID;
             packetInfo.CarrierFreq = obj.CarrierInformation.DLFreq;
