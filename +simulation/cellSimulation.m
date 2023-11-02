@@ -136,29 +136,24 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
     
     % Create an object for MAC and PHY metrics visualization.
     nodes = struct('UEs', {UEs}, 'GNB', gNB);
-    metricsVisualizer = visualizationTools.metricsVisualizer(cellSimuParams, 'Nodes', nodes, ...
-        'EnableSchedulerMetricsPlots', true, 'EnablePhyMetricsPlots', true);
+    metricsVisualizer = visualizationTools.metricsVisualizer(cellSimuParams, 'Nodes', nodes);
 
     % Initialize sensing parameters
-    senTxGrid = [];     % initialize sensing Tx grid
     carrierInfo = gNB.PhyEntity.CarrierInformation;
     waveInfoDL  = gNB.PhyEntity.WaveformInfoDL;
     radarParams = sensing.radarParams(cellSimuParams, carrierInfo, waveInfoDL);
     cfarConfig  = sensing.detection.cfar2D(radarParams);
 
     % Run the processing loop
-    slotNum = 0;
-    symPerSlot = waveInfoDL.SymbolsPerSlot;
-    numSymbols = cellSimuParams.numSlots*symPerSlot; % simulation time in units of symbol duration
-    tickGranularity = 1; % execute all the symbols in the simulation
+    symPerSlot      = waveInfoDL.SymbolsPerSlot;
+    numSlots        = cellSimuParams.numSlots;
+    tickGranularity = symPerSlot; % set to '1' to execute all the symbols in the simulation
 
-    % ISAC process
-    for symbolNum = 1 : tickGranularity : numSymbols
+    % Communication process
+    for slotNum = 1:numSlots
 
-        if mod(symbolNum - 1, symPerSlot) == 0
-            slotNum = slotNum + 1;
-        end
-
+        symbolNum = symPerSlot*(slotNum-1)+1;
+        
         % Run the gNB
         run(gNB);
 
@@ -167,15 +162,6 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
             run(UEs{ueIdx});
         end
 
-        % Determine the current slot type
-        currentSlot = gNB.PhyEntity.CurrSlot;
-        slotType = communication.determineSlotType(cellSimuParams.tddPattern, cellSimuParams.specialSlot, currentSlot);
-        
-        % Accumulate PDSCH symbols in the downlink slot
-        if strcmp(slotType, 'D')
-            senTxGrid = cat(2, senTxGrid, gNB.PhyEntity.txGrid);
-        end
-    
         % Logging
         if cellSimuParams.enableTraces
             % MAC logging
@@ -183,7 +169,7 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
             % PHY logging
             logCellPhyStats(simPhyLogger, symbolNum, gNB, UEs);
         end
-        
+
         % Visualization    
         % Check slot boundary
         if symbolNum > 1 && ((cellSimuParams.schedulingType == 1 && mod(symbolNum, symPerSlot) == 0) || (cellSimuParams.schedulingType == 0 && mod(symbolNum-1, symPerSlot) == 0))
@@ -200,9 +186,20 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
         end
     end
 
-    %% Radar mono-static sensing and the corresponding results
-    senRxGrid  = sensing.monoStaticSensing(senTxGrid, carrierInfo, waveInfoDL, radarParams);
-    senResults = sensing.estimation.fft2D(radarParams, cfarConfig, senRxGrid, senTxGrid);
+    % Sensing process
+    % Sensing transmission grid and waveform
+    senTxGrid = gNB.PhyEntity.senTxGrid;
+    senTxWave = gNB.PhyEntity.senTxWave;
+    % Mono-static sensing
+    senRxGrid = sensing.monoStaticSensing(senTxWave, size(senTxGrid), carrierInfo, radarParams, cellSimuParams.targetLoSConditions);
+    % Sensing Results
+    try
+        senResults = sensing.estimation.fft2D(radarParams, cfarConfig, senRxGrid, senTxGrid);
+    catch exception
+        errorMessage = getReport(exception, 'extended', 'hyperlinks', 'off');
+        fprintf('Error in the cellSimulation function:\n%s\n', errorMessage)
+        senResults = NaN;
+    end
     
     %% Communicaiton simulation visualization and Logs
     % For logging the simulation parameters
@@ -228,10 +225,13 @@ function [comResults, senResults] = cellSimulation(cellSimuParams)
     % direction. The maximum number of DL layers possible for a UE is minimum of its Rx 
     % antennas and gNB's Tx antennas. Similarly, the maximum number of UL layers possible
     % for a UE is minimum of its Tx antennas and gNB's Rx antennas.
-    comResults = savePerformanceIndicators(metricsVisualizer);
-
-    % Plot ECDF of performance indicators
-    plotPerformanceIndicatorsECDF(metricsVisualizer);
+    try 
+        comResults = saveMetrics(metricsVisualizer);
+    catch exception
+        errorMessage = getReport(exception, 'extended', 'hyperlinks', 'off');
+        fprintf('Error in the cellSimulation function:\n%s\n', errorMessage)
+        comResults = NaN;
+    end
     
     % The five types of run-time visualization shown are:
     %
