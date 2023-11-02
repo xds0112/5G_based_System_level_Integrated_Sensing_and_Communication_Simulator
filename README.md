@@ -23,7 +23,7 @@
     Radar estimation algorithms (2D-FFT and MUSIC)
 
 
-### Members participated in this project:<br>
+### Initial members participated in this project:<br>
     D.S. Xue, J.C. Wei, Y.G. Li, T.L. Zeng,
     Key Laboratory of Universal Wireless Communications, Ministry of Education,
     Beijing University of Posts and Telecommunications,
