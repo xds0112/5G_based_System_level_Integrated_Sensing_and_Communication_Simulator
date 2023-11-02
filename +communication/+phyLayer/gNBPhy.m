@@ -101,6 +101,9 @@ classdef gNBPhy < communication.phyLayer.phyInterface
         % and column array panels, respectively
         RxAntPanel
 
+        %TDDPattern TDD pattern used for mono-static sensing
+        TddPattern
+
         %NumTxAnts Number of transmit antennas
         NumTxAnts (1, 1) {mustBeMember(NumTxAnts, [1,2,4,8,16,32,64,128,256,512,1024])} = 1
 
@@ -252,6 +255,9 @@ classdef gNBPhy < communication.phyLayer.phyInterface
             % Set the number of erroneous packets and the total number of
             % packets received from each UE to zero
             obj.ULBlkErr = zeros(param.numUEs, 2);
+
+            % Set TDD DL-UL pattern
+            obj.TddPattern = param.tddPattern;
             
             % Set Tx power in dBm
             if isfield(param, 'gNBTxPower')
@@ -582,24 +588,36 @@ classdef gNBPhy < communication.phyLayer.phyInterface
             end
             obj.CSIRSPDU = {};
 
-            % Fill PDSCH symbols in the grid
-            if ~isempty(obj.PDSCHPDU)
-                txGrid = populatePDSCH(obj, obj.PDSCHPDU, obj.MacPDU, txGrid);
-            end
-
-            % OFDM modulation
-            txWaveform = nrOFDMModulate(carrier, txGrid);
-
             % Signal amplitude
             signalAmp = db2mag(obj.TxPower-30)*sqrt(obj.WaveformInfoDL.Nfft^2/(size(txGrid, 1)*obj.NumTxAnts));
 
-            % Apply signal amplitude
-            txWaveform = signalAmp*txWaveform;
+            % Fill PDSCH symbols in the grid
+            if ~isempty(obj.PDSCHPDU)
+                txGrid = populatePDSCH(obj, obj.PDSCHPDU, obj.MacPDU, txGrid);
+            
+                % OFDM modulation
+                txWaveform = nrOFDMModulate(carrier, txGrid);
+    
+                % Apply signal amplitude
+                txWaveform = signalAmp*txWaveform;
 
-            % Sensing transmission resource grid and wave
-            obj.senTxGrid = cat(2, obj.senTxGrid, txGrid);
-            obj.senTxWave = cat(1, obj.senTxWave, txWaveform);
-        
+                % Mono-static sensing transmission resource grid and wave
+                currSlotType = communication.determineSlotType(obj.TddPattern, obj.CurrSlot);
+                if currSlotType == 'D'
+                    obj.senTxGrid = cat(2, obj.senTxGrid, txGrid);
+                    obj.senTxWave = cat(1, obj.senTxWave, txWaveform);
+                else % uplink gap
+                    obj.senTxGrid = cat(2, obj.senTxGrid, zeros(size(txGrid)));
+                    obj.senTxWave = cat(1, obj.senTxWave, zeros(size(txWaveform)));
+                end
+            else
+                % OFDM modulation
+                txWaveform = nrOFDMModulate(carrier, txGrid);
+
+                % Apply signal amplitude
+                txWaveform = signalAmp*txWaveform;
+            end
+     
             % Trim txWaveform to span only the transmission symbols
             slotNumSubFrame = mod(obj.CurrSlot, obj.WaveformInfoDL.SlotsPerSubframe);
             startSymSubframe = slotNumSubFrame*obj.WaveformInfoDL.SymbolsPerSlot + 1; % Start symbol of current slot in the subframe
@@ -608,7 +626,7 @@ classdef gNBPhy < communication.phyLayer.phyInterface
             startSample = sum(symbolLengths(1:obj.CurrSymbol)) + 1;
             endSample = sum(symbolLengths(1:obj.CurrSymbol+numTxSymbols));
             txWaveform = txWaveform(startSample:endSample, :);
- 
+
             % Construct packet information
             packetInfo.Waveform = txWaveform;
             packetInfo.Position = obj.Node.Position;
