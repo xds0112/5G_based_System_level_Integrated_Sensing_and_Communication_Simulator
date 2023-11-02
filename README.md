@@ -17,8 +17,7 @@
     Pathloss modeling
     Simulation visualization tools
 ### Sensing simulation functions (mono-static sensing), including:<br>
-### (Closed-Source)
-    Radar bidirectional propagation channel modeling
+    Radar echo modeling
     Mono-static radar sensing modeling
     Radar detection algorithms (2D-CFAR)
     Radar estimation algorithms (2D-FFT and MUSIC)
