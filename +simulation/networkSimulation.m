@@ -28,20 +28,40 @@ function [comResults, senResults] = networkSimulation(simuParams, enableParallel
     [cellSimuParams, comResults, senResults] = deal(cell(numCells, 1));
 
     % Plot simulation layout
-    simuLayout = generateScenario(cityParams{1}, roi);
+    [ueLoS, targetLoS] =  generateScenario(roi, cityParams, bsParams, ueParams, targetParams);
 
-    % Loop over all the cells
+    % Get simulation parameters for each cell
     for iCell = 1:numCells
-        % Get simulation parameters for each cell
+        % Cell simulation parameters
         cellSimuParams{iCell} = simulation.assignCellSimulationParameters(time, bsParams{iCell}, ...
             schedulingParams{iCell}, trafficParams{iCell}, pathlossParams{iCell}, comChannelParams{iCell}, logDecision);
-
-        % check the LoS conditions for each cell
-        [cellSimuParams{iCell}.ueLoSConditions, cellSimuParams{iCell}.targetLoSConditions] = checkLoS(simuLayout, bsParams{iCell}, ueParams{iCell}, targetParams{iCell});
-
-        % ISAC simulation for each cell
-        [comResults{iCell}, senResults{iCell}] = simulation.cellSimulation(cellSimuParams{iCell});
+    
+        % Get LoS conditions
+        [cellSimuParams{iCell}.ueLoSConditions, cellSimuParams{iCell}.targetLoSConditions] = deal(ueLoS{iCell}, targetLoS{iCell});
     end
+
+    % Loop over all the cells
+    if enableParallelSim % parallel simulation
+
+        % Parallel computing pool
+        delete(gcp('nocreate'));
+        parpool();
+
+        % Use parfeval to asynchronously run ISAC cell simulation
+        cellResults = parfeval(@simulation.cellSimulation, 2, cellSimuParams{:});
+
+        % Retrieve results once the execution of cellSimulation is complete
+        [comResults, senResults] = fetchOutputs(cellResults);
+
+    else % local simulation
+        for iCell = 1:numCells
+            % ISAC simulation for each cell
+            [comResults{iCell}, senResults{iCell}] = simulation.cellSimulation(cellSimuParams{iCell});
+        end
+    end
+
+    % Plot ECDF of communication metrics
+    plotComMetricsECDF(comResults)
 
 end
 
@@ -56,36 +76,53 @@ function validateCellParams(bsParams, ueParams, targetParams, schedulingParams, 
     end
 end
 
-function simuLayout = generateScenario(cityParams, roi)
+function [ueLoS, targetLoS] = generateScenario(roi, cityParams, bsParams, ueParams, targetParams)
     % Generate scenario
     % Invoke the constructor to create the simulation scenario
-    simuLayout = networkTopology.blockages.openStreetMapCity(cityParams, roi);
-    
-    % Plot the layout, gNB and UEs
+    simuLayout = networkTopology.blockages.openStreetMapCity(cityParams{1}, roi);
+
+    % gNB, UEs, and targets topology parameters
+    [gNBPos, uePos, targetPos] = deal([]);
+    numCells = length(bsParams);
+    for i = 1:numCells
+        gNBPos    = cat(1, gNBPos, bsParams{i}.position);
+        uePos     = cat(1, uePos, ueParams{i}.position);
+        targetPos = cat(1, targetPos, targetParams{i}.position);
+    end
+
+    % Plot the layout and network nodes
     figure(1)
     title('Simulation Scenario')
     
-    simuLayout.plot(tools.colors.lightGrey) % light grey
+    % Plot the layout
+    simuLayout.plot(tools.colors.darkOrange) % dark orange
 
     grid on
 
     xlim([roi.xMin roi.xMax])
     ylim([roi.yMin roi.yMax])
 
+    % Plot gNB, UEs, targets, and LoS links
+    [ueLoS, targetLoS] = deal(cell(numCells, 1)); % los conditions within each cell
+    for j = 1:numCells
+        [ueLoS{j}, targetLoS{j}] = plotLoS(simuLayout, bsParams{j}, ueParams{j}, targetParams{j});
+    end
+
     xlabel('x axis (m)')
     ylabel('y axis (m)')
     zlabel('z axis (m)')
+
 end
 
-function [ueLoSConditions, targetLoSConditions] = checkLoS(simuLayout, bsParams, ueParams, targetParams)
+function [ueLoSConditions, targetLoSConditions] = plotLoS(simuLayout, bsParams, ueParams, targetParams)
 % Check and plot the LoS conditions between antennas
 % on the gNB and UEs within each cell
 
-    % gNB and UEs topology parameters
+    % gNBs and UEs topology parameters
     gNBPos     = bsParams.position;
     uePos      = ueParams.position;
-    numUEs     = ueParams.numUEs;
     targetPos  = targetParams.position;
+    numUEs     = ueParams.numUEs;
     numTargets = targetParams.numTargets;
 
     % Plot the layout, gNB/antennas, UEs and targets
@@ -131,6 +168,67 @@ function [ueLoSConditions, targetLoSConditions] = checkLoS(simuLayout, bsParams,
         legend([gNBPlot uePlot targetPlot], {'gNB' 'UEs' 'Targets'})
         disp('Note that no LoS path exists in the simulation scenario')
     end
+end
+
+function plotComMetricsECDF(results)
+
+    numCells = numel(results);
+
+    % Plot uplink throughput 
+    figure('Name', 'ECDF of UL Throughput & Goodput')
+
+    for n = 1:numCells
+        cellstr = ['cell-' num2str(n)];
+        ulThroughputDataRate = results{n}.ueULThroughput;
+        ulGoodPutDataRate    = results{n}.ueULGoodput;
+        ulTp = tools.plotECDF(ulThroughputDataRate, 1);
+        hold on
+        ulGp = tools.plotECDF(ulGoodPutDataRate, 1);
+        legend([ulTp, ulGp], {['Uplink throughput of ' cellstr], ['Uplink goodput of ' cellstr]})
+    end
+    grid on
+    title('ECDF of Uplink Throughput and Goodput')
+    xlabel('Data Rate (Mbps)')
+    ylabel('Cumulative Probability')
+
+
+    % Plot downlink throughput  
+    figure('Name', 'ECDF of DL Throughput & Goodput')
+
+    for n = 1:numCells
+        cellstr = ['cell-' num2str(n)];
+        dlThroughputDataRate = results{n}.ueDLThroughput;
+        dlGoodputDataRate    = results{n}.ueDLGoodput;
+        dlTp = tools.plotECDF(dlThroughputDataRate, 1);
+        hold on
+        dlGp = tools.plotECDF(dlGoodputDataRate, 1);
+        legend([dlTp, dlGp], {['Downlink throughput of ' cellstr], ['Downlink goodput of ' cellstr]})
+    end
+    grid on
+    title('ECDF of Downlink Throughput and Goodput')
+    xlabel('Data Rate (Mbps)')
+    ylabel('Cumulative Probability')
+
+    % Plot uplink & downlink BLER
+    figure('Name', 'ECDF of DL & UL BLER')
+
+    for n = 1:numCells
+        ulBLER = results{n}.ueULBLER;
+        dlBLER = results{n}.ueDLBLER;
+        if ~any(isnan(ulBLER)) && ~any(isnan(dlBLER))
+            ulbl = tools.plotECDF(ulBLER, 1);
+            hold on
+            dlbl = tools.plotECDF(dlBLER, 1);
+            legend([ulbl dlbl], {['Uplink BLER of ' cellstr], ['Downlink BLER of ' cellstr]})
+        end
+    end
+
+    grid on
+    xlim([0 1])
+    xlabel('Block Error Rate')
+    ylabel('Cumulative Probability')
+    title('ECDF of Uplink and Downlink Block Error Rates')
+
 end
 
 
