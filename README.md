@@ -31,7 +31,7 @@
 
 
 ## MATLAB version and toolboxes required: 
-    R2022a or above,
+    R2022a/b, (R2023 or above is not available) 
     5G Toolbox, Phased Array System Toolbox, Wireless Communication Toolbox.
 
 
