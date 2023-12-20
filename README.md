@@ -1,6 +1,6 @@
 # 5G-based System-level Integrated Sensing and Communication Simulator
 ## STILL UNDER DEVELOPING and DEBUGGING
-## NOTE: R2023a or above is not available for this simulator
+## NOTE: R2023a or above is NOT available for this simulator
 ## Codes for the paper: 'A Performance Evaluation Software Platform for 5G-based Integrated Sensing and Communication'
     System-level Simulator (SLS) for NR-based Integrated Sensing and Communication (ISAC).
 ![image](https://github.com/xds0112/5G_based_System_level_Integrated_Sensing_and_Communication_Simulator/blob/main/dataFiles/platformICON.bmp)
