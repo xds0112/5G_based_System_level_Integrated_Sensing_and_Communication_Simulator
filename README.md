@@ -27,7 +27,7 @@
     D.S. Xue, J.C. Wei, Y.G. Li, T.L. Zeng,
     Key Laboratory of Universal Wireless Communications, Ministry of Education,
     Beijing University of Posts and Telecommunications,
-    Beijing, PR China.
+    Beijing, P. R. China.
 
 
 ## MATLAB version and toolboxes required: 
@@ -54,6 +54,7 @@
 
 
 ## Contact
+    li-yonggang@bupt.edu.cn (currently in charge)
     xuedongsheng@bupt.edu.cn
 
 
