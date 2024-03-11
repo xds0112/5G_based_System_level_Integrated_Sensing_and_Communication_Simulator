@@ -39,7 +39,7 @@
 
 ## Getting Started
     To simulate the system-level ISAC scenario,
-    open "ISAC" to run the simulation.
+    open "ISAC.mlapp" to run the simulation.
 
 
 ## Documentation
