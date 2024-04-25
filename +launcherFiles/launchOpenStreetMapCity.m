@@ -8,10 +8,7 @@ clc; close all; clear;
 % If set to 'true', the simulation will be run in parallel mode, which can improve 
 % the efficiency of the computation when multiple processors are available.
 enableParallelSim = false;
-% flag = 1;
 
 % Invoke the simulator
 results = simulate(@scenarios.openStreetMapCity, enableParallelSim);
 
-% restore data
-%restoredata(results, flag)

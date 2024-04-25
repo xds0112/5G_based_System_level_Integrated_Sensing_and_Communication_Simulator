@@ -29,7 +29,7 @@ function [comResults, senResults] = networkSimulation(simuParams, enableParallel
 
     
     % Plot simulation layout
-    %simuLayout = generateScenario1(roi, cityParams);
+    simuLayout = generateScenario1(roi, cityParams);
 
     % Get simulation parameters for each cell
     for iCell = 1:numCells
@@ -70,7 +70,7 @@ function [comResults, senResults] = networkSimulation(simuParams, enableParallel
     end
 
     % Plot ECDF of communication metrics
-    %plotComMetricsECDF(comResults)
+    plotComMetricsECDF(comResults)
     
 end
 
