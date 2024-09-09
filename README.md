@@ -49,12 +49,11 @@
     All rights reserved.
 
     System-level ISAC Simulator
-    Author: Dongsheng Xue, et.al.
+    Author: D. Xue, et.al.
 
 
 ## Contact
     li-yonggang@bupt.edu.cn (currently in charge)
-    xuedongsheng@bupt.edu.cn
 
 
 ## 3GPP Standards:
