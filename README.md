@@ -16,10 +16,10 @@
     Pathloss modeling
     Simulation visualization tools
 ### Sensing simulation functions (mono-static sensing), including:<br>
-    Radar echo modeling
-    Mono-static radar sensing modeling
-    Radar detection algorithms (2D-CFAR)
-    Radar estimation algorithms (2D-FFT and MUSIC)
+    Echo modeling
+    Mono-static sensing modeling
+    Detection algorithms (2D-CFAR)
+    Estimation algorithms (2D-FFT and MUSIC)
 
 
 ### Initial members participated in this project:<br>
