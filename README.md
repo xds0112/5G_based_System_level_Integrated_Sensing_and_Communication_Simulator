@@ -24,9 +24,8 @@
 
 ### Initial members participated in this project:<br>
     D. Xue, J. Wei, Y. Li, T. Zeng,
-    Key Laboratory of Universal Wireless Communications, Ministry of Education,
     Beijing University of Posts and Telecommunications,
-    Beijing, P.R. China.
+    Beijing, P. R. China.
 
 
 ## MATLAB version and toolboxes required: 
